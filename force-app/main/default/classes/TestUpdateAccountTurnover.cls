@@ -1,5 +1,5 @@
 @isTest
-private class UpdateCaAccountAndNetAmountOrderTest{
+private class TestUpdateAccountTurnover{
     
     @isTest
     static void testUpdateAccountChiffreAffaireWithOneOrderAndMultipleOrderItem(){
