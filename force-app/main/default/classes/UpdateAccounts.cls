@@ -1,28 +1,35 @@
-global class Batch01AccountTurnover implements Database.Batchable<sObject>{
-    
+global class UpdateAccountCAOrderOrdered implements Database.Batchable<sObject>{
     global Database.QueryLocator start(Database.BatchableContext info){ 
-            // Request only accounts that have at least one order with status 'ordered'
-        return Database.getQueryLocator('SELECT Id FROM Account');
- 
+        // Only query accounts with at least an order with status "Ordered"
+        return Database.getQueryLocator([select Id,Name,(select Id,TotalAmount,OrderNumber,status from Orders)
+       from Account where Id in (select AccountId from Order where status ='Ordered')]);
     }
-     
-    global void execute(Database.BatchableContext info, List<Account> scope){      
-        list<Order> listOrders =  [SELECT Id, TotalAmount, AccountId FROM Order WHERE Status = 'Activated'];
-        
-         for(integer i=0; i < scope.size(); i++){
-             Account myAccount = scope[i];
-             myAccount.Chiffre_d_affaire__c = 0;
-            for(integer j=0; j < listOrders.size(); j++){
-                if(listOrders[j].AccountId == myAccount.Id){
-                    myAccount.Chiffre_d_affaire__c = myAccount.Chiffre_d_affaire__c + listOrders[j].TotalAmount;
-                }                   
+    
+    global void execute(Database.BatchableContext info, List<Account> scope){ 
+        // For each account update the "Chiffre d'affaire" field 
+
+        List<Account> acctsToUpdate = new List<Account>();
+        List<Order> listOrders =  [select Id,TotalAmount,AccountId,status from Order where status ='Activated'];
+        for(Account acct:scope){
+            acct.Chiffre_d_affaire__c =0;
+            for(order ord:listOrders){
+                if(ord.AccountId == acct.Id){
+                    acct.Chiffre_d_affaire__c =  acct.Chiffre_d_affaire__c + ord.TotalAmount;
+                }
             }
+            acctsToUpdate.add(acct);
+        }
+        if(acctsToUpdate.isEmpty())
+            system.debug('No Account has any orders ordered');
+        else{
+            update acctsToUpdate;
+            system.debug('Batch executed');
         }
         
-        update scope;
-    }    
-     
-    global void finish(Database.BatchableContext info){     
         
+    }    
+    
+    global void finish(Database.BatchableContext info){     
+        system.debug('Batch finished');
     } 
- }
+}
