@@ -18,7 +18,6 @@ trigger UpdateAccountTotalRevenue on Order (after update) {
         system.debug(acct);
     }
     
-     update accountsToUpdate;
-
+     
 
 }
