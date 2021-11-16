@@ -1,4 +1,4 @@
-trigger CalculateAmount on Order (before update) {
+trigger CalculateNetAmount on Order (before update) {
     for(order ord : trigger.new){
         if(ord.NetAmount__c == null && ord.ShipmentCost__c== null){
             ord.NetAmount__c = 0;

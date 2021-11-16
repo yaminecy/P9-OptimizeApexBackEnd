@@ -6,7 +6,7 @@ trigger UpdateAccountTurnover on Order (after update) {
         
     List<Account> accountsToUpdate=new List<Account>();
     Map<ID, Account> acc = new Map<ID, Account>([select id,Chiffre_d_affaire__c from account where id in :ids]);
-    AggregateResult[] groupedResults = [SELECT AccountId,SUM(TotalAmount)amt FROM Order where AccountId in:ids and Status='Activated' group by AccountId]; //Query all orders with status "Activated" and group them by account
+    AggregateResult[] groupedResults = [SELECT AccountId,SUM(TotalAmount)amt FROM Order where AccountId in:ids and Status='Ordered' group by AccountId]; //Query all orders with status "Activated" and group them by account
 
     for(AggregateResult Results: groupedResults){
          Id accountId =(id) Results.get('AccountId');         
