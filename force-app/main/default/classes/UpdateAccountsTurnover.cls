@@ -1,4 +1,4 @@
-global class UpdateAccounts implements Database.Batchable<sObject>{
+global class UpdateAccountsTurnover implements Database.Batchable<sObject>{
     global Database.QueryLocator start(Database.BatchableContext info){ 
         // Only query accounts with at least an order with status "Ordered"
         return Database.getQueryLocator([select Id,Name,(select Id,TotalAmount,OrderNumber,status from Orders)
